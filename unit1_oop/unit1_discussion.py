@@ -24,8 +24,19 @@ from copy import copy, deepcopy
 #
 # Replace the pass statement with your implementation.
 
-class ParentClass:
-    pass
+class NetworkDevice:
+    device_type = "Network Device"
+
+    def __init__(self, hostname, ip_address, status):
+        self.hostname = hostname
+        self.ip_address = ip_address
+        self.status = status
+
+    def describe(self):
+        return (
+            f"{self.device_type}: {self.hostname} | "
+            f"IP Address: {self.ip_address} | Status: {self.status}"
+        )
 
 
 # TODO 2:
@@ -40,8 +51,43 @@ class ParentClass:
 #
 # Replace the pass statement with your implementation.
 
-class ChildClass(ParentClass):
-    pass
+class Router(NetworkDevice):
+    device_type = "Router"
+
+    def __init__(self, hostname, ip_address, status, routing_protocol, interfaces):
+        super().__init__(hostname, ip_address, status)
+        self.routing_protocol = routing_protocol
+        self.interfaces = interfaces
+
+    def describe(self):
+        return (
+            f"{self.device_type}: {self.hostname} | "
+            f"IP Address: {self.ip_address} | Status: {self.status} | "
+            f"Routing Protocol: {self.routing_protocol} | "
+            f"Interfaces: {self.interfaces}"
+        )
+
+    def check_connectivity(self):
+        if self.status.lower() == "online":
+            return f"{self.hostname} is online and available."
+        return f"{self.hostname} is offline and may need troubleshooting."
+
+
+# Student-created extension: a switch uses the shared parent functionality
+# but adds VLAN information specific to network switches.
+class Switch(NetworkDevice):
+    device_type = "Switch"
+
+    def __init__(self, hostname, ip_address, status, vlan_ids):
+        super().__init__(hostname, ip_address, status)
+        self.vlan_ids = vlan_ids
+
+    def describe(self):
+        return (
+            f"{self.device_type}: {self.hostname} | "
+            f"IP Address: {self.ip_address} | Status: {self.status} | "
+            f"VLANs: {self.vlan_ids}"
+        )
 
 
 # TODO 3:
@@ -57,7 +103,25 @@ class ChildClass(ParentClass):
 
 def demonstrate_namespaces():
     print("\n=== Namespace Demonstration ===")
-    print("TODO: Implement namespace demonstration")
+
+    router1 = Router("R1", "192.168.1.1", "Online", "OSPF", 4)
+    router2 = Router("R2", "192.168.1.2", "Offline", "BGP", 6)
+
+    print("Class variable through class:", Router.device_type)
+    print("Class variable through object:", router1.device_type)
+
+    # This attribute belongs only to router1; router2 remains unchanged.
+    router1.location = "Main Office"
+
+    print("\nRouter 1 instance namespace:")
+    print(router1.__dict__)
+
+    print("\nRouter 2 instance namespace:")
+    print(router2.__dict__)
+
+    # The class namespace contains attributes and methods defined on Router.
+    print("\nRouter class namespace:")
+    print(Router.__dict__)
 
 
 # TODO 4:
@@ -73,7 +137,30 @@ def demonstrate_namespaces():
 
 def demonstrate_copying():
     print("\n=== Copy Demonstration ===")
-    print("TODO: Implement shallow copy and deep copy demonstration")
+
+    original_config = {
+        "hostname": "R1",
+        "vlans": [10, 20, 30],
+        "interfaces": {
+            "GigabitEthernet0/1": "192.168.1.1",
+            "GigabitEthernet0/2": "192.168.1.2"
+        }
+    }
+
+    shallow_config = copy(original_config)
+    deep_config = deepcopy(original_config)
+
+    # A shallow copy creates a new outer dictionary but shares references
+    # to nested lists and dictionaries with the original configuration.
+    #
+    # A deep copy recursively copies nested data, so modifications to the
+    # original nested objects do not change the deep copy.
+    original_config["vlans"].append(40)
+    original_config["interfaces"]["GigabitEthernet0/3"] = "192.168.1.3"
+
+    print("Original configuration:", original_config)
+    print("Shallow copy:", shallow_config)
+    print("Deep copy:", deep_config)
 
 
 # TODO 5:
@@ -87,11 +174,24 @@ def demonstrate_copying():
 # - Call your copy demonstration function.
 
 def main():
-    print("=== Unit 1 OOP Assignment ===")
+    print("=== Network Device Management System ===")
 
-    print("\nTODO: Create and test your parent object")
+    print("\nParent class object:")
+    device = NetworkDevice("CoreDevice", "192.168.1.10", "Online")
+    print(device.describe())
 
-    print("\nTODO: Create and test your child object")
+    print("\nChild class object:")
+    router = Router("R1", "192.168.1.1", "Online", "OSPF", 4)
+    print(router.describe())
+    print(router.check_connectivity())
+
+    print("\nStudent-Created Extension:")
+    switch = Switch("SW1", "192.168.1.20", "Online", [10, 20, 30])
+
+    # Different device classes can provide their own describe() behavior.
+    devices = [device, router, switch]
+    for network_device in devices:
+        print(network_device.describe())
 
     demonstrate_namespaces()
     demonstrate_copying()
