@@ -63,7 +63,7 @@ Steps to Run the Code
 2. Open the terminal in the folder containing the Python file.
 3. Execute the command:
 
-   ‘python3 unit4_trees.py’
+   ‘python3 unit4_discussion.py’
 
 Results
 
